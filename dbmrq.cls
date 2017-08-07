@@ -75,12 +75,24 @@
 % Packages >>>1
 
 \RequirePackage{indentfirst}
-\RequirePackage{sensible}
 \RequirePackage{lipsum}
 \RequirePackage{xstring}
 \RequirePackage{mfirstuc}
 \RequirePackage{lastpage}
 \RequirePackage{lettrine}
+\RequirePackage{microtype}
+\RequirePackage[autostyle]{csquotes}
+\RequirePackage[inline]{enumitem}
+
+\RequirePackage{iftex}
+
+\ifPDFTeX
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage[utf8]{inputenc}
+\else
+  \RequirePackage{fontspec}
+  \defaultfontfeatures{Ligatures=TeX}
+\fi
 
 \RequirePackage{mdframed}
 \mdfsetup{%
@@ -128,16 +140,14 @@
 
 % Fonts >>>1
 
-\notbool{nofonts}{% >>>2
+\notbool{nofonts}{
 
-  \RequirePackage{iftex}
+  \ifPDFTeX% >>>2
+  % <<<2
 
-  \ifPDFTeX% >>>3
-  % <<<3
+  \else% >>>2
 
-  \else% >>>3
-
-    \ifXeTeX%% XeTeX >>>4
+    \ifXeTeX%% XeTeX >>>3
       \usepackage{fontspec}
       \setmainfont
           [Numbers={OldStyle,Proportional},
@@ -150,9 +160,9 @@
       \newfontfamily{\FullBold}{Minion Pro Bold}
       \newfontface\Swash{MinionPro-ItDisp}[Contextuals=Swash]
       \newfontface\Disp{MinionPro-Disp}[Contextuals=Swash]
-      \setmonofont{Inconsolata}% <<<4
+      \setmonofont{Inconsolata}% <<<3
 
-    \else%% LuaTeX >>>4
+    \else%% LuaTeX >>>3
       \usepackage{fontspec}
       \setmainfont
           [Numbers={OldStyle,Proportional},
@@ -168,7 +178,7 @@
       \setmonofont{Inconsolata}
       \usepackage{unicode-math}
       \setmathfont{MinionMath-Regular}
-    \fi% <<<4
+    \fi% <<<3
 
     \defaultfontfeatures{Ligatures=TeX}
 
@@ -176,9 +186,9 @@
 
     \newcommand\lf{\addfontfeature{Numbers=Lining}}
 
-  \fi% <<<3
+  \fi% <<<2
 
-}% <<<2
+}
 
 % <<<1
 
@@ -659,6 +669,14 @@
 % <<<1
 
 % Misc >>>1
+
+\clubpenalty=9996
+\widowpenalty=9999
+\brokenpenalty=4991
+\predisplaypenalty=10000
+\postdisplaypenalty=1549
+\displaywidowpenalty=1602
+\doublehyphendemerits=640000
 
 \setlength{\parindent}{2em}
 
