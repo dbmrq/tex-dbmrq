@@ -227,6 +227,7 @@
 
   \setsubsubsecheadstyle{\Swash}
   % \setsubsubsecindent{\parindent}
+  % \setsubsubsecindent{0pt}
   \setbeforesubsubsecskip{1.6\baselineskip}
   \setaftersubsubsecskip{.6\baselineskip}
 }
@@ -241,7 +242,7 @@
 
 \makechapterstyle{dbmhangnum}{% >>>3
   \chapterstyle{default}
-  \setlength{\beforechapskip}{40pt}
+  \setlength{\beforechapskip}{50pt}
   \setlength{\afterchapskip}{20pt}
   \renewcommand*{\chapterheadstart}{\vspace{\beforechapskip}}
   \settowidth{\chapindent}{%
