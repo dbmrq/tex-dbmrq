@@ -81,6 +81,7 @@
 \RequirePackage{lastpage}
 \RequirePackage{lettrine}
 \RequirePackage{microtype}
+\RequirePackage{expl3}
 \RequirePackage[autostyle]{csquotes}
 \RequirePackage[inline]{enumitem}
 
@@ -131,60 +132,6 @@
   \setlength{\topskip}{1.6\topskip}
   \checkandfixthelayout
   \sloppybottom
-}
-
-% <<<1
-
-% Fonts >>>1
-
-\notbool{nofonts}{
-
-  \ifPDFTeX% >>>2
-  % <<<2
-
-  \else% >>>2
-
-    \ifXeTeX%% XeTeX >>>3
-      \usepackage{fontspec}
-      \setmainfont
-          [Numbers={OldStyle,Proportional},
-          Ligatures=TeX,
-          ItalicFont={* Italic},
-          BoldFont={* Medium},
-          BoldItalicFont={* Medium Italic}]
-          {Minion Pro}
-      \newfontfamily{\SemiBold}{Minion Pro Semibold}
-      \newfontfamily{\FullBold}{Minion Pro Bold}
-      \newfontface\Swash{MinionPro-ItDisp}[Contextuals=Swash]
-      \newfontface\Disp{MinionPro-Disp}[Contextuals=Swash]
-      \setmonofont{Inconsolata}% <<<3
-
-    \else%% LuaTeX >>>3
-      \usepackage{fontspec}
-      \setmainfont
-          [Numbers={OldStyle,Proportional},
-          Ligatures=TeX,
-          ItalicFont={MinionPro-It},
-          BoldFont={MinionPro-Medium},
-          BoldItalicFont={MinionPro-MediumIt}]
-          {MinionPro-Regular}
-      \newfontfamily{\SemiBold}{MinionPro-Semibold}
-      \newfontfamily{\FullBold}{MinionPro-Bold}
-      \newfontface\Swash{MinionPro-ItDisp}[Contextuals=Swash]
-      \newfontface\Disp{MinionPro-Disp}[Contextuals=Swash]
-      \setmonofont{Inconsolata}
-      \usepackage{unicode-math}
-      \setmathfont{MinionMath-Regular}
-    \fi% <<<3
-
-    \defaultfontfeatures{Ligatures=TeX}
-
-    \thickmuskip=5mu plus 3mu minus 1mu
-
-    \newcommand\lf{\addfontfeature{Numbers=Lining}}
-
-  \fi% <<<2
-
 }
 
 % <<<1
@@ -457,23 +404,19 @@
     \begin{mdframed}
     \begin{raggedright}
 
-      % \small
-
       \vspace{2\baselineskip}
       \@cuttercode
 
       \hspace*{0.15\textwidth}\begin{minipage}{0.85\textwidth}
 
-      % \reversemarginpar
-      % \marginnote{M357i}
       \begingroup
       \hyphenpenalty 10000
       \exhyphenpenalty 10000
+      \hbadness=10000
 
       \vspace{-2\baselineskip}\vspace{-2\parskip}
       \LASTFirst{\@author}
 
-      % \hspace{-5.5em} MM357i \hspace{3em}
       \hspace{2em} \@title\ / \@author; orientador \@supervisor\
       - \@location, \@date.
 
@@ -486,8 +429,6 @@
 
       \vspace{1em}
 
-      % \hspace{2em} 1. Filosofia. 2. Fenomenologia. 3. Lógica. 4. Idealidade.
-      % 5. Husserl. I.  Ferraz, Marcus Sacrini Ayres, orient. II. Título.
       \hspace{2em}
       1. \StrBefore{\@keywords}{,}.
       2. \StrBetween[1,2]{\@keywords}{,}{,}.
