@@ -107,9 +107,6 @@
 \renewcommand\foreignabbrfont{}
 \let\cf\@undefined
 
-% ou hang em vez de marginal, pra não ficar voando
-\RequirePackage[bottom, marginal, perpage]{footmisc}
-
 \AtEndPreamble{\RequirePackage{hyperref}}
 
 % <<<1
@@ -208,7 +205,15 @@
   \MakeLowercase{\scshape \rightmark} \quad \thepage%
 }
 
-\renewcommand*{\footnotelayout}{\footnotesize}
+% Always print footnotes in the bottom
+\feetatbottom
+
+% Hang footnote numbers in the margin
+\setlength{\footmarkwidth}{-1em}
+\setlength{\footmarksep}{1em}
+
+% Increase the space between the text and the footnotes
+\setfootins{1.5\bigskipamount}{\bigskipamount}
 
 % <<<1
 
@@ -617,9 +622,9 @@
 
 % <<<1
 
-% Sumário >>>1
+% TOC >>>1
 
-% Sumário simples >>>2
+% Simple TOC >>>2
 
 % \renewcommand{\contentsname}{Sumário}
 % \renewcommand{\cftchapterpresnum}{\lf}
@@ -636,7 +641,7 @@
 
 \renewcommand*{\contentsname}{Sumário}
 \renewcommand*{\aftertoctitle}{\thispagestyle{empty}\afterchaptertitle}
-\maxtocdepth{subsection}
+\maxtocdepth{section}
 \setlength{\cftparskip}{0.2\baselineskip}
 
 \renewcommand{\cftpartfont}{\large}
