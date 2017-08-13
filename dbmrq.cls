@@ -78,8 +78,9 @@
 \RequirePackage{lipsum}
 \RequirePackage{xstring}
 \RequirePackage{mfirstuc}
-\RequirePackage{lastpage}
+\RequirePackage{pageslts}
 \RequirePackage{lettrine}
+\RequirePackage{atveryend}
 \RequirePackage{microtype}
 \RequirePackage{expl3}
 \RequirePackage[autostyle]{csquotes}
@@ -354,8 +355,13 @@
 
 \newcommand{\makecover}{% >>>2
   \begin{titlingpage}%
-    \calccentering{\unitlength}
-    \begin{adjustwidth*}{\unitlength}{-\unitlength}
+    \newlength{\marginoffset}
+    \ifbool{paper}{%
+      \setlength{\marginoffset}{0pt}
+    }{%
+      \calccentering{\marginoffset}
+    }
+    \begin{adjustwidth*}{\marginoffset}{-\marginoffset}
       \center
       {\large \textsc{\MakeLowercase{\@organization}}}
       \vfill
@@ -633,26 +639,38 @@
 
 % <<<1
 
-\AtBeginDocument{% >>>1
+\AtEndPreamble{% >>>1
 
-  % Começar a bibliografia numa página nova
   \ltx@ifpackageloaded{biblatex}{%
     \defbibheading{bibliography}[\bibname]{%
-      \SingleSpace
       \def\clearpage{\newpage \write\m@ne{}\vbox{}\penalty -\@Mi}
+      \clearpage
+      \emergencystretch=1em
+      \SingleSpacing
       \chapter*{#1}
     }
     \renewcommand*{\bibnameunderscore}{%
       \rule[-1pt]{3em}{0.75pt}%
     }
     \bibhang 1em
-  }{}
 
-\frenchspacing
+    \DeclareBibliographyCategory{singleentries}
+    \newcommand{\singlecite}[1]{%
+      \addtocategory{singleentries}{#1}%
+      \defbibcheck{key#1}{
+        \iffieldequalstr{entrykey}{#1}{}{%
+          \skipentry%
+        }%
+      }%
+      \printbibliography[heading=none,check=key#1]%
+    }
+
+  }{}
 
 }% <<<1
 
 \AfterEndPreamble{% >>>1
+% For some reason I get errors if this stuff is \AtBeginDocument
 
 \ifbool{paper}{\makecover}
 
@@ -682,8 +700,9 @@
   \clearpage
   \tableofcontents*
 
-  \mainmatter
 }% <<<2
+
+  \mainmatter
 
 \ifbool{strict}{%
   \begin{Spacing}{1.4}
@@ -693,18 +712,29 @@
 
 }% <<<1
 
+\AtBeginDocument{% >>>1
+
+\frenchspacing
+
+}% <<<1
+
 \AtEndDocument {% >>>1
 
 \end{Spacing}
 
-\notbool{nobib}{%
-  \ltx@ifpackageloaded{biblatex}{%
-    % \clearpage
-    \emergencystretch=1em
-    \SingleSpacing
-    \printbibliography
-  }
-}
-
 }% <<<1
+
+% \AfterLastShipout {% >>>1
+% Unfortunately this messes up the number of pages
+
+% \notbool{nobib}{%
+%   \ltx@ifpackageloaded{biblatex}{%
+%     % \clearpage
+%     \emergencystretch=1em
+%     \SingleSpacing
+%     \printbibliography
+%   }
+% }
+
+% }% <<<1
 
