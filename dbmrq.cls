@@ -78,13 +78,14 @@
 \RequirePackage{lipsum}
 \RequirePackage{xstring}
 \RequirePackage{mfirstuc}
-\RequirePackage{pageslts}
 \RequirePackage{lettrine}
 \RequirePackage{atveryend}
 \RequirePackage{microtype}
 \RequirePackage{expl3}
 \RequirePackage[autostyle]{csquotes}
 \RequirePackage[inline]{enumitem}
+
+\ifbool{thesis}{\RequirePackage{pageslts}}{}
 
 \RequirePackage{iftex}
 
@@ -109,7 +110,17 @@
 \renewcommand\foreignabbrfont{}
 \let\cf\@undefined
 
-\AtEndPreamble{\RequirePackage{hyperref}}
+\AtEndPreamble{
+
+\RequirePackage{hyperref}
+% This is necessary so chapters with the same numbers (on different parts)
+% will be referenced properly:
+\renewcommand*{\theHchapter}{\thepart.\thebook.\thechapter}
+
+}
+
+\usepackage{perpage}
+\MakePerPage{footnote}
 
 % <<<1
 
@@ -221,6 +232,8 @@
 % Part >>>2
 
 \aliaspagestyle{part}{empty}
+
+\@addtoreset{chapter}{part}
 
 \ifbool{paper}{%
   \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
@@ -384,8 +397,8 @@
       \hspace{.5\textwidth}
       \begin{minipage}{.49\textwidth}
       	\SingleSpacing
-        \@thesistype\ apresentada à \@faculty\ da \@university\ para obtenção
-        do título de \@goal\ sob oriação do Prof.  Dr. \@supervisor.
+        \@thesistype\ apresentada à \@faculty\ da \@university\ para obtenção
+        do título de \@goal\ sob orientação do Prof. Dr. \@supervisor.
        \end{minipage}%
     \vfill
     {\large \@location \\ \@date}
@@ -480,13 +493,13 @@
 
     \rule{\textwidth}{0.4pt}
 
-    Prof. \StrBefore{\@committee}{,}
+    Prof. Dr. \StrBefore{\@committee}{,}
 
     \vfil
 
     \rule{\textwidth}{0.4pt}
 
-    Prof. \StrBehind{\@committee}{,}
+    Prof. Dr. \StrBehind{\@committee}{,}
     \end{center}
     \end{titlingpage}%
 }% <<<2
@@ -501,7 +514,7 @@
   \addcontentsline{toc}{chapter}{Epígrafe}
   \vspace*{\fill}
   \hfill
-  \begin{minipage}{.85\textwidth}
+  \begin{minipage}{.7\textwidth}
 
   \abnormalparskip{0.7\baselineskip}%
 
