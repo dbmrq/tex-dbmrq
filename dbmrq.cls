@@ -371,7 +371,8 @@
     \ifbool{paper}{%
       \setlength{\marginoffset}{0pt}
     }{%
-      \calccentering{\marginoffset}
+      % \calccentering{\marginoffset}
+      \ifbool{paper}{\calccentering{\marginoffset}}{}
     }
     \begin{adjustwidth*}{\marginoffset}{-\marginoffset}
       \center
@@ -682,47 +683,45 @@
 }% <<<1
 
 \AfterEndPreamble{% >>>1
-% For some reason I get errors if this stuff is \AtBeginDocument
+  % For some reason I get errors if this stuff is \AtBeginDocument
 
-\pagenumbering{arabic}
+  \frontmatter
 
-\ifbool{paper}{\makecover}
+  \ifbool{paper}{\makecover}
 
   \pagestyle{simpleheader}
   % \pagestyle{dbmheader}
 
-\ifbool{thesis}{% >>>2
-  \SingleSpacing
+  \ifbool{thesis}{% >>>2
+    \SingleSpacing
 
-  \nouppercaseheads
+    \nouppercaseheads
 
-  \frontmatter
+    \makecover
+    \clearpage
+    \maketitlepage
+    \clearpage
+    \makecolophon
+    \clearpage
+    \makeapproval
+    \clearpage
+    \makethanks
+    \clearpage
+    \makeepigraph
+    \clearpage
+    \makeabstract
+    \clearpage
+    \tableofcontents*
 
-  \makecover
-  \clearpage
-  \maketitlepage
-  \clearpage
-  \makecolophon
-  \clearpage
-  \makeapproval
-  \clearpage
-  \makethanks
-  \clearpage
-  \makeepigraph
-  \clearpage
-  \makeabstract
-  \clearpage
-  \tableofcontents*
-
-}% <<<2
+  }% <<<2
 
   \mainmatter
 
-\ifbool{strict}{%
-  \begin{Spacing}{1.4}
-}{%
-  \begin{Spacing}{1.5}
-}
+  \ifbool{strict}{%
+    \begin{Spacing}{1.4}
+  }{%
+    \begin{Spacing}{1.5}
+  }
 
 }% <<<1
 
