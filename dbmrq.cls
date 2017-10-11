@@ -84,8 +84,7 @@
 \RequirePackage{expl3}
 \RequirePackage[autostyle]{csquotes}
 \RequirePackage[inline]{enumitem}
-
-\ifbool{thesis}{\RequirePackage{pageslts}}{}
+\RequirePackage{pageslts}
 
 \RequirePackage{iftex}
 
@@ -685,13 +684,15 @@
 \AfterEndPreamble{% >>>1
 % For some reason I get errors if this stuff is \AtBeginDocument
 
-\ifbool{paper}{\makecover}
+\pagenumbering{arabic}
 
-\ifbool{thesis}{% >>>2
-  \SingleSpacing
+\ifbool{paper}{\makecover}
 
   \pagestyle{simpleheader}
   % \pagestyle{dbmheader}
+
+\ifbool{thesis}{% >>>2
+  \SingleSpacing
 
   \nouppercaseheads
 
