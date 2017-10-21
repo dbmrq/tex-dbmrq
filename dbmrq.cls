@@ -442,12 +442,8 @@
       }{}
       {\large \@author}
       \vfill
-      \ifbool{quali}{%
-        \vfill%
-        {\Large \textbf{\@title}}
-      }{%
-        {\Large \@title}
-      }
+      \vfill%
+      {\Large \textbf{\@title}}
       \vfill
         \hspace{.5\textwidth}
         \begin{minipage}{.49\textwidth}
