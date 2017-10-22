@@ -85,6 +85,7 @@
 \RequirePackage[autostyle]{csquotes}
 \RequirePackage[inline]{enumitem}
 \RequirePackage{pageslts}
+\RequirePackage{xcolor}
 
 \RequirePackage{iftex}
 
@@ -108,15 +109,6 @@
 \RequirePackage[xlatin]{foreign}
 \renewcommand\foreignabbrfont{}
 \let\cf\@undefined
-
-\AtEndPreamble{
-
-\RequirePackage{hyperref}
-% This is necessary so chapters with the same numbers (on different parts)
-% will be referenced properly:
-\renewcommand*{\theHchapter}{\thepart.\thebook.\thechapter}
-
-}
 
 \usepackage{perpage}
 \MakePerPage{footnote}
@@ -148,6 +140,14 @@
 % <<<1
 
 % Headers and footers >>>1
+
+\makepagestyle{dbmrqplain}
+\makeevenhead{dbmrqplain}{}{}{}
+\makeoddhead{dbmrqplain}{}{}{}
+\makeevenfoot{dbmrqplain}{}{}{}
+\makeoddfoot{dbmrqplain}{}{}{}
+
+\aliaspagestyle{titlingpage}{dbmrqplain}
 
 \makepagestyle{simpleheader}
 \makeevenhead{simpleheader}{\thepage}{}{}
@@ -230,7 +230,7 @@
 
 % Part >>>2
 
-\aliaspagestyle{part}{empty}
+\aliaspagestyle{part}{dbmrqplain}
 
 \@addtoreset{chapter}{part}
 
@@ -423,7 +423,7 @@
     \begin{mdframed}
     \begin{raggedright}
 
-      \vspace{2\baselineskip}
+      \vspace*{3\baselineskip}
       \@cuttercode
 
       \hspace*{0.15\textwidth}\begin{minipage}{0.85\textwidth}
@@ -433,7 +433,7 @@
       \exhyphenpenalty 10000
       \hbadness=10000
 
-      \vspace{-2\baselineskip}\vspace{-2\parskip}
+      \vspace{-3\baselineskip}%\vspace{-2\parskip}
       \LASTFirst{\@author}
 
       \hspace{2em} \@title\ / \@author; orientador \@supervisor\
@@ -474,7 +474,7 @@
 
 \newcommand{\makeapproval}{% >>>2
     \begin{titlingpage}%
-    \thispagestyle{empty}
+    \thispagestyle{dbmrqplain}
     \makereference
 
     \vfil
@@ -510,11 +510,11 @@
 }% <<<2
 
 \newcommand{\makeepigraph}{% >>>2
-  \thispagestyle{empty}
+  \thispagestyle{dbmrqplain}
   \addcontentsline{toc}{chapter}{Epígrafe}
   \vspace*{\fill}
   \hfill
-  \begin{minipage}{.7\textwidth}
+  \begin{minipage}{.65\textwidth}
 
   \abnormalparskip{0.7\baselineskip}%
 
@@ -592,7 +592,7 @@
 % \renewcommand{\cftpartpagefont}{\lf}
 % \renewcommand{\cftchapterpagefont}{\lf}
 % \renewcommand{\cftsectionpagefont}{\lf}
-% \renewcommand{\aftertoctitle}{\thispagestyle{empty}\afterchaptertitle}
+% \renewcommand{\aftertoctitle}{\thispagestyle{dbmrqplain}\afterchaptertitle}
 % \setlength{\cftparskip}{0.2\baselineskip}
 % \renewcommand{\cftpartfont}{\normalfont\large}
 % \renewcommand{\cftpartname}{Parte\space}
@@ -600,10 +600,11 @@
 % <<<2
 
 \renewcommand*{\contentsname}{Sumário}
-\renewcommand*{\aftertoctitle}{\thispagestyle{empty}\afterchaptertitle}
+\renewcommand*{\aftertoctitle}{\thispagestyle{dbmrqplain}\afterchaptertitle}
 \maxtocdepth{section}
 \setlength{\cftparskip}{0.2\baselineskip}
 
+\setlength{\cftbeforepartskip}{1.5\baselineskip}
 \renewcommand{\cftpartfont}{\large}
 \renewcommand{\cftpartleader}{}
 \renewcommand{\cftpartafterpnum}{\cftparfillskip}
@@ -611,22 +612,29 @@
 \renewcommand{\partnumberline}[1]{}
 \cftpagenumbersoff{part}
 
+% This is necessary so that hyperref and \MakeLowercase play well
+% \settocpreprocessor{chapter}{%
+%   \let\tempf@rtoc\f@rtoc%
+%   \def\f@rtoc{%
+%     \texorpdfstring{\MakeTextLowercase{\tempf@rtoc}}{\tempf@rtoc}}%
+% }
+
 \setlength{\cftbeforechapterskip}{.5\baselineskip}
-\renewcommand{\cftchapterfont}{\normalsize}
-\renewcommand{\cftchapterpagefont}{\normalsize}
+\renewcommand{\cftchapterfont}{\normalsize\bfseries}
+\renewcommand{\cftchapterpagefont}{\normalsize\color{black!61}}
 \renewcommand{\cftchapterpresnum}{\hspace*{-1.5em}}
 \cftsetindents{chapter}{1.5em}{0em}
 \renewcommand{\cftchapterleader}{}
 \renewcommand{\cftchapterafterpnum}{\cftparfillskip}
 
 \renewcommand{\cftsectionfont}{\small\bfseries}
-\renewcommand{\cftsectionpagefont}{\small\bfseries}
+\renewcommand{\cftsectionpagefont}{\small\bfseries\color{black!61}}
 \cftsetindents{section}{1.5em}{2.3em}
 \renewcommand{\cftsectionleader}{}
 \renewcommand{\cftsectionafterpnum}{\cftparfillskip}
 
 \renewcommand{\cftsubsectionfont}{\small}
-\renewcommand{\cftsubsectionpagefont}{\small}
+\renewcommand{\cftsubsectionpagefont}{\small\color{black!61}}
 \cftsetindents{subsection}{3.8em}{2em}
 \renewcommand{\cftsubsectionleader}{}
 \renewcommand{\cftsubsectionafterpnum}{\cftparfillskip}
@@ -655,17 +663,41 @@
 \AtEndPreamble{% >>>1
 
   \ltx@ifpackageloaded{biblatex}{%
-    \defbibheading{bibliography}[\bibname]{%
+
+    \defbibheading{bibliography}[\refname]{% >>>2
       \def\clearpage{\newpage \write\m@ne{}\vbox{}\penalty -\@Mi}
       \clearpage
       \emergencystretch=1em
       \SingleSpacing
-      \chapter*{#1}
-    }
+      \chapter*{#1}%
+      \ifmemoirbibintoc
+        {\phantomsection
+        \addcontentsline{toc}{chapter}{#1}}
+        {}%
+      \markboth{\memUChead{#1}}{\memUChead{#1}}}% <<<2
+
+    \defbibheading{subbibliography}[\refname]{% >>>2
+      \section*{#1}%
+      % \ifmemoirbibintoc
+      %   {\phantomsection
+      %   \addcontentsline{toc}{section}{#1}}
+      %   {}%
+      \if@twoside\markright{\memUChead{#1}}\fi}% <<<2
+
+    \defbibheading{subsubbibliography}[\refname]{% >>>2
+      \subsection*{#1}%
+      % \ifmemoirbibintoc
+      %   {\phantomsection
+      %   \addcontentsline{toc}{section}{#1}}
+      %   {}%
+      \if@twoside\markright{\memUChead{#1}}\fi}% <<<2
+
     \renewcommand*{\bibnameunderscore}{%
       \rule[-1pt]{3em}{0.75pt}%
     }
+
     \bibhang 1em
+    \setlength{\shorthandwidth}{3em}
 
     \DeclareBibliographyCategory{singleentries}
     \newcommand{\singlecite}[1]{%
@@ -680,6 +712,11 @@
 
   }{}
 
+\RequirePackage[plainpages=false]{hyperref}
+% This is necessary so chapters with the same numbers (on different parts)
+% will be referenced properly:
+\renewcommand*{\theHchapter}{\thepart.\thebook.\thechapter}
+
 }% <<<1
 
 \AfterEndPreamble{% >>>1
@@ -688,9 +725,6 @@
   \frontmatter
 
   \ifbool{paper}{\makecover}
-
-  \pagestyle{simpleheader}
-  % \pagestyle{dbmheader}
 
   \ifbool{thesis}{% >>>2
     \SingleSpacing
@@ -716,6 +750,7 @@
   }% <<<2
 
   \mainmatter
+  \pagestyle{simpleheader}
 
   \ifbool{strict}{%
     \begin{Spacing}{1.4}
