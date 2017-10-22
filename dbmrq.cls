@@ -7,13 +7,47 @@
 
 % paper >>>2
 \providebool{paper}
-\DeclareOption{paper}{\booltrue{paper}}
+\DeclareOption{paper}{\booltrue{paper}\boolfalse{thesis}}
 % <<<2
 
 % thesis >>>2
 
 \providebool{thesis}
 \DeclareOption{thesis}{\booltrue{\thesis}}
+\DeclareOption{tese}{\booltrue{\thesis}}
+
+% phd >>>3
+\DeclareOption{phd}{\booltrue{thesis}}
+\DeclareOption{phdthesis}{\booltrue{thesis}}
+\DeclareOption{doctors}{\booltrue{thesis}}
+\DeclareOption{doutorado}{\booltrue{thesis}}
+% <<<3
+
+% masters >>>3
+\providebool{masters}
+\DeclareOption{masters}{
+  \booltrue{masters}
+  \booltrue{thesis}
+}
+\DeclareOption{mathesis}{
+  \booltrue{masters}
+  \booltrue{thesis}
+}
+\DeclareOption{mestrado}{
+  \booltrue{masters}
+  \booltrue{thesis}
+}
+% <<<3
+
+% <<<2
+
+% quali >>>2
+
+\providebool{quali}
+\DeclareOption{quali}{\booltrue{quali}}
+\DeclareOption{qualification}{\booltrue{quali}}
+\DeclareOption{qualificacao}{\booltrue{quali}}
+\DeclareOption{qualificação}{\booltrue{quali}}
 
 % phd >>>3
 \DeclareOption{phd}{\booltrue{thesis}}
@@ -59,6 +93,11 @@
 % nofonts >>>2
 \providebool{nofonts}
 \DeclareOption{nofonts}{\booltrue{nofonts}}
+% <<<2
+
+% resetchapters >>>2
+\providebool{resetchapters}
+\DeclareOption{resetchapters}{\booltrue{resetchapters}}
 % <<<2
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{memoir}}
@@ -232,7 +271,7 @@
 
 \aliaspagestyle{part}{dbmrqplain}
 
-\@addtoreset{chapter}{part}
+\ifbool{resetchapters}{\@addtoreset{chapter}{part}}{}
 
 \ifbool{paper}{%
   \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
@@ -311,7 +350,7 @@
     \newcommand*{\@program}{Doutorado}
     \newcommand*{\thesistype}[1]{\gdef\@thesistype{#1}}
     \newcommand*{\@thesistype}{Tese}
-  }
+  }{}
 }
 
 \renewcommand*{\@date}{\the\year}
@@ -369,10 +408,9 @@
   \begin{titlingpage}%
     \newlength{\marginoffset}
     \ifbool{paper}{%
-      \setlength{\marginoffset}{0pt}
+      \calccentering{\marginoffset}%
     }{%
-      % \calccentering{\marginoffset}
-      \ifbool{paper}{\calccentering{\marginoffset}}{}
+      \setlength{\marginoffset}{0pt}%
     }
     \begin{adjustwidth*}{\marginoffset}{-\marginoffset}
       \center
@@ -389,19 +427,41 @@
 
 \newcommand{\maketitlepage}{% >>>2
   \begin{titlingpage}%
-    \center
-    {\large \@author}
-    \vfill
-    {\Large \@title}
-    \vfill
-      \hspace{.5\textwidth}
-      \begin{minipage}{.49\textwidth}
-      	\SingleSpacing
-        \@thesistype\ apresentada à \@faculty\ da \@university\ para obtenção
-        do título de \@goal\ sob orientação do Prof. Dr. \@supervisor.
-       \end{minipage}%
-    \vfill
-    {\large \@location \\ \@date}
+    \newlength{\tpmarginoffset}
+    \ifbool{quali}{%
+      \calccentering{\tpmarginoffset}%
+    }{%
+      \setlength{\tpmarginoffset}{0pt}%
+    }
+    \begin{adjustwidth*}{\tpmarginoffset}{-\tpmarginoffset}
+      \center
+      \ifbool{quali}{%
+        {\large \textsc{\MakeLowercase{\@organization}}}
+        \vfill
+        \vfill
+      }{}
+      {\large \@author}
+      \vfill
+      \vfill%
+      {\Large \textbf{\@title}}
+      \vfill
+        \hspace{.5\textwidth}
+        \begin{minipage}{.49\textwidth}
+          \SingleSpacing
+          \ifbool{quali}{%
+            \@thesistype\ apresentada à \@faculty\ da \@university\ para
+            o exame de qualificação do programa de
+            \ifbool{masters}{mestrado}{doutorado} em Filosofia, sob orientação
+            do Prof. Dr. \@supervisor.
+          }{%
+            \@thesistype\ apresentada à \@faculty\ da \@university\ para
+            obtenção do título de \@goal\, sob orientação do Prof. Dr.
+            \@supervisor.
+          }
+        \end{minipage}%
+      \vfill
+      {\large \@location \\ \@date}
+    \end{adjustwidth*}
   \end{titlingpage}
 }% <<<2
 
@@ -724,30 +784,42 @@
 
   \frontmatter
 
-  \ifbool{paper}{\makecover}
+  \pagestyle{simpleheader}
+  % \pagestyle{dbmheader}
+
+  \ifbool{paper}{\makecover}{}
 
   \ifbool{thesis}{% >>>2
     \SingleSpacing
 
     \nouppercaseheads
 
-    \makecover
-    \clearpage
+
+    \notbool{quali}{%
+      \makecover
+      \clearpage
+    }{}
+
     \maketitlepage
     \clearpage
-    \makecolophon
-    \clearpage
-    \makeapproval
-    \clearpage
-    \makethanks
-    \clearpage
-    \makeepigraph
-    \clearpage
-    \makeabstract
-    \clearpage
+
+    \notbool{quali}{%
+
+      \makecolophon
+      \clearpage
+      \makeapproval
+      \clearpage
+      \makethanks
+      \clearpage
+      \makeepigraph
+      \clearpage
+      \makeabstract
+      \clearpage
+    }{}
+
     \tableofcontents*
 
-  }% <<<2
+  }{}% <<<2
 
   \mainmatter
   \pagestyle{simpleheader}
@@ -782,7 +854,7 @@
 %     \SingleSpacing
 %     \printbibliography
 %   }
-% }
+% }{}
 
 % }% <<<1
 
