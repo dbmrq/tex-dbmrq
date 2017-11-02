@@ -49,24 +49,6 @@
 \DeclareOption{qualificacao}{\booltrue{quali}}
 \DeclareOption{qualificação}{\booltrue{quali}}
 
-% phd >>>3
-\DeclareOption{phd}{\booltrue{thesis}}
-\DeclareOption{phdthesis}{\booltrue{thesis}}
-\DeclareOption{doctors}{\booltrue{thesis}}
-% <<<3
-
-% masters >>>3
-\providebool{masters}
-\DeclareOption{masters}{
-  \booltrue{masters}
-  \booltrue{thesis}
-}
-\DeclareOption{mathesis}{
-  \booltrue{masters}
-  \booltrue{thesis}
-}
-% <<<3
-
 % <<<2
 
 % strict >>>2
@@ -329,9 +311,6 @@
   \@faculty
 }
 
-\renewcommand{\epigraph}[1]{\gdef\@epigraph{#1}}
-\newcommand{\@epigraph}{\lipsum[1]}
-
 \newcommand*{\location}[1]{\gdef\@location{#1}}
 \newcommand*{\@location}{São Paulo}
 
@@ -564,12 +543,23 @@
     \end{titlingpage}%
 }% <<<2
 
-\newcommand{\makethanks}{% >>>2
-  \chapter{Agradecimentos}
-  \lipsum[1-4]
-}% <<<2
+% Thanks >>>2
 
-\newcommand{\makeepigraph}{% >>>2
+\renewcommand{\thanks}[1]{\gdef\@thanks{#1}}
+\renewcommand{\@thanks}{\lipsum[1-4]}
+\newcommand{\makethanks}{%
+  \chapter{Agradecimentos}
+  \@thanks%
+}%
+
+% <<<2
+
+% Epigraph >>>2
+
+\renewcommand{\epigraph}[1]{\gdef\@epigraph{#1}}
+\newcommand{\@epigraph}{\lipsum[1]}
+
+\newcommand{\makeepigraph}{
   \thispagestyle{dbmrqplain}
   \addcontentsline{toc}{chapter}{Epígrafe}
   \vspace*{\fill}
@@ -581,15 +571,25 @@
   \@epigraph
 
   \end{minipage}
-}% <<<2
+}
 
-\newcommand{\makeabstract}{% >>>2
+% <<<2
+
+% Abstract >>>2
+
+\newcommand{\resumo}[1]{\gdef\@resumo{#1}}
+\newcommand{\@resumo}{\lipsum[1-2]}
+
+\renewcommand{\abstract}[1]{\gdef\@abstract{#1}}
+\newcommand{\@abstract}{\lipsum[1-2]}
+
+\newcommand{\makeabstract}{
   \chapter{Resumo}
   \makereference
 
   \hspace{\baselineskip}
 
-  \lipsum[1-2]
+  \@resumo
 
   \hspace{\baselineskip}
 
@@ -602,12 +602,14 @@
 
   \hspace{\baselineskip}
 
-  \lipsum[1-2]
+  \@abstract
 
   \hspace{\baselineskip}
 
   \noindent Keywords:
-}% <<<2
+}
+
+% <<<2
 
 % <<<1
 
@@ -681,28 +683,38 @@
 
 \setlength{\cftbeforechapterskip}{.5\baselineskip}
 \renewcommand{\cftchapterfont}{\normalsize\bfseries}
-\renewcommand{\cftchapterpagefont}{\normalsize\color{black!61}}
 \renewcommand{\cftchapterpresnum}{\hspace*{-1.5em}}
 \cftsetindents{chapter}{1.5em}{0em}
 \renewcommand{\cftchapterleader}{}
 \renewcommand{\cftchapterafterpnum}{\cftparfillskip}
 
 \renewcommand{\cftsectionfont}{\small\bfseries}
-\renewcommand{\cftsectionpagefont}{\small\bfseries\color{black!61}}
 \cftsetindents{section}{1.5em}{2.3em}
 \renewcommand{\cftsectionleader}{}
 \renewcommand{\cftsectionafterpnum}{\cftparfillskip}
 
 \renewcommand{\cftsubsectionfont}{\small}
-\renewcommand{\cftsubsectionpagefont}{\small\color{black!61}}
 \cftsetindents{subsection}{3.8em}{2em}
 \renewcommand{\cftsubsectionleader}{}
 \renewcommand{\cftsubsectionafterpnum}{\cftparfillskip}
 % \setlength{\cftsubsectionnumwidth}{0}
 
+
+\renewcommand{\cftsectionpagefont}{\small\bfseries\color{black!61}}
+\renewcommand{\cftchapterpagefont}{\cftsectionpagefont}
+\renewcommand{\cftsubsectionpagefont}{\cftsectionpagefont}
+
 % <<<1
 
 % Misc >>>1
+
+\newbool{final}
+\notbool{quali}{\booltrue{final}}{}
+
+\RequirePackage{environ}
+\NewEnviron{quali}{\ifbool{quali}{\BODY}{}}
+\NewEnviron{notquali}{\notbool{quali}{\BODY}{}}
+\NewEnviron{final}{\notbool{quali}{\BODY}{}}
 
 \clubpenalty=9996
 \widowpenalty=9999
@@ -772,7 +784,7 @@
 
   }{}
 
-\RequirePackage[plainpages=false]{hyperref}
+\RequirePackage[plainpages=false,linktoc=all]{hyperref}
 % This is necessary so chapters with the same numbers (on different parts)
 % will be referenced properly:
 \renewcommand*{\theHchapter}{\thepart.\thebook.\thechapter}
