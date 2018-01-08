@@ -162,19 +162,7 @@
 
 % Headers and footers >>>1
 
-\makepagestyle{dbmrqplain}
-\makeevenhead{dbmrqplain}{}{}{}
-\makeoddhead{dbmrqplain}{}{}{}
-\makeevenfoot{dbmrqplain}{}{}{}
-\makeoddfoot{dbmrqplain}{}{}{}
-
-\aliaspagestyle{titlingpage}{dbmrqplain}
-
-\makepagestyle{simpleheader}
-\makeevenhead{simpleheader}{\thepage}{}{}
-\makeoddhead{simpleheader}{}{}{\thepage}
-\makeevenfoot{simpleheader}{}{}{}
-\makeoddfoot{simpleheader}{}{}{}
+\aliaspagestyle{titlingpage}{empty}
 
 \makepagestyle{dbmheader}
 \makeevenhead{dbmheader}{%
@@ -222,7 +210,7 @@
 
 % Chapter >>>2
 
-\aliaspagestyle{chapter}{simpleheader}
+\aliaspagestyle{chapter}{simple}
 
 \makechapterstyle{dbmhangnum}{% >>>3
   \chapterstyle{default}
@@ -251,7 +239,7 @@
 
 % Part >>>2
 
-\aliaspagestyle{part}{dbmrqplain}
+\aliaspagestyle{part}{empty}
 
 \ifbool{resetchapters}{\@addtoreset{chapter}{part}}{}
 
@@ -260,18 +248,31 @@
   \renewcommand*{\partnamefont}{\normalfont\Capt\scshape\Large\MakeLowercase}
   \renewcommand*{\partnumfont}{\normalfont\Capt\scshape\Large\MakeLowercase}
 }{
-  \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
-  \renewcommand*{\partnamefont}{\normalfont\scshape\Large\MakeLowercase}
-  \renewcommand*{\partnumfont}{\normalfont\scshape\Large\MakeLowercase}
+  \notbool{quali}{%
+    \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
+    \renewcommand*{\partnamefont}{\normalfont\scshape\Large\MakeLowercase}
+    \renewcommand*{\partnumfont}{\normalfont\scshape\Large\MakeLowercase}
+  }{%
+    \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
+    \renewcommand*{\partnamefont}{\normalfont\scshape\Large\MakeLowercase}
+    \renewcommand*{\partnumfont}{\normalfont\scshape\Large\MakeLowercase}
+  }
 }
 
 \renewcommand*{\afterpartskip}{%
-  \par%
-  \vskip 30pt%
-  \begin{center}{\par\hspace{-3pt}\HUGE\symbol{57537}}\end{center}%
-  \vfil\newpage%
+  \notbool{quali}{%
+    \ltx@ifpackageloaded{dbmrqminion}{%
+      \vspace{30pt}
+      {\HUGE\leaf}%
+    }{}%
+    \vfil\newpage%
+  }{\vskip 50pt}
 }%
-\renewcommand*{\midpartskip}{\par\vskip 10pt}%
+\ifbool{quali}{%
+  \renewcommand*{\midpartskip}{\vskip -5pt}%
+}{%
+  \renewcommand*{\midpartskip}{\par\vspace{50pt}}
+}
 
 % <<<2
 
@@ -423,21 +424,20 @@
       \vfill
       \vfill%
       {\Large \textbf{\@title}}
-      \vfill
-        \hspace{.5\textwidth}
-        \begin{minipage}{.49\textwidth}
-          \SingleSpacing
-          \ifbool{quali}{%
-            \@thesistype\ apresentada à \@faculty\ da \@university\ para
-            o exame de qualificação do programa de
-            \ifbool{masters}{mestrado}{doutorado} em Filosofia, sob orientação
-            do Prof. Dr. \@supervisor.
-          }{%
+        \ifbool{quali}{%
+          \vspace{20pt}\par
+          {\small Texto para qualificação}
+          \vfill
+        }{%
+          \vfill
+          \hspace{.5\textwidth}
+          \begin{minipage}{.49\textwidth}
+            \SingleSpacing
             \@thesistype\ apresentada à \@faculty\ da \@university\ para
             obtenção do título de \@goal\, sob orientação do Prof. Dr.
             \@supervisor.
-          }
-        \end{minipage}%
+          \end{minipage}%
+        }
       \vfill
       {\large \@location \\ \@date}
     \end{adjustwidth*}
@@ -513,7 +513,7 @@
 
 \newcommand{\makeapproval}{% >>>2
     \begin{titlingpage}%
-    \thispagestyle{dbmrqplain}
+    \thispagestyle{empty}
     \makereference
 
     \vfil
@@ -560,7 +560,7 @@
 \newcommand{\@epigraph}{\lipsum[1]}
 
 \newcommand{\makeepigraph}{
-  \thispagestyle{dbmrqplain}
+  \thispagestyle{empty}
   \addcontentsline{toc}{chapter}{Epígrafe}
   \vspace*{\fill}
   \hfill
@@ -628,6 +628,14 @@
 \setlist*[inlinex,1]{%
   label=(\arabic*), itemjoin={{, }}, itemjoin*={{ ou }}%
 }
+\newlist{inlinin*}{enumerate*}{1}
+\setlist*[inlinin*,1]{%
+  label=(\arabic*), itemjoin={{; }}, itemjoin*={{ e }}%
+}
+\newlist{inlinex*}{enumerate*}{1}
+\setlist*[inlinex*,1]{%
+  label=(\arabic*), itemjoin={{; }}, itemjoin*={{ ou }}%
+}
 
 \renewenvironment{quote}{%
   \small
@@ -654,7 +662,7 @@
 % \renewcommand{\cftpartpagefont}{\lf}
 % \renewcommand{\cftchapterpagefont}{\lf}
 % \renewcommand{\cftsectionpagefont}{\lf}
-% \renewcommand{\aftertoctitle}{\thispagestyle{dbmrqplain}\afterchaptertitle}
+% \renewcommand{\aftertoctitle}{\thispagestyle{empty}\afterchaptertitle}
 % \setlength{\cftparskip}{0.2\baselineskip}
 % \renewcommand{\cftpartfont}{\normalfont\large}
 % \renewcommand{\cftpartname}{Parte\space}
@@ -662,7 +670,7 @@
 % <<<2
 
 \renewcommand*{\contentsname}{Sumário}
-\renewcommand*{\aftertoctitle}{\thispagestyle{dbmrqplain}\afterchaptertitle}
+\renewcommand*{\aftertoctitle}{\thispagestyle{empty}\afterchaptertitle}
 \maxtocdepth{section}
 \setlength{\cftparskip}{0.2\baselineskip}
 
@@ -796,7 +804,7 @@
 
   \frontmatter
 
-  \pagestyle{simpleheader}
+  \pagestyle{simple}
   % \pagestyle{dbmheader}
 
   \ifbool{paper}{\makecover}{}
@@ -834,7 +842,7 @@
   }{}% <<<2
 
   \mainmatter
-  \pagestyle{simpleheader}
+  \pagestyle{simple}
 
   \ifbool{strict}{%
     \begin{Spacing}{1.4}
