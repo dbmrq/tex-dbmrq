@@ -5,9 +5,49 @@
 
 \RequirePackage{etoolbox}
 
+% sfcover >>>2
+\providebool{hardcover}
+\DeclareOption{hardcover}{\booltrue{hardcover}}
+% <<<2
+
+% sfcover >>>2
+\providebool{sfcover}
+\DeclareOption{sfcover}{\booltrue{sfcover}}
+% <<<2
+
 % paper >>>2
 \providebool{paper}
-\DeclareOption{paper}{\booltrue{paper}\boolfalse{thesis}}
+\DeclareOption{paper}{%
+  \booltrue{paper}%
+  \boolfalse{thesis}%
+  \PassOptionsToClass{oneside}{memoir}
+  \PassOptionsToClass{article}{memoir}
+}
+% <<<2
+
+% section >>>2
+\providebool{section}
+\DeclareOption{section}{%
+  \booltrue{section}%
+}
+% <<<2
+
+% fapesp >>>2
+\providebool{fapesp}
+\DeclareOption{fapesp}{%
+  \booltrue{fapesp}%
+  \PassOptionsToClass{oneside}{memoir}
+  \PassOptionsToClass{article}{memoir}
+}
+% <<<2
+
+% project >>>2
+\providebool{project}
+\DeclareOption{project}{%
+  \booltrue{project}%
+  \PassOptionsToClass{oneside}{memoir}
+  \PassOptionsToClass{article}{memoir}
+}
 % <<<2
 
 % thesis >>>2
@@ -77,6 +117,11 @@
 \DeclareOption{nofonts}{\booltrue{nofonts}}
 % <<<2
 
+% Versão corrigida >>>2
+\providebool{corrigida}
+\DeclareOption{corrigida}{\booltrue{corrigida}}
+% <<<2
+
 % resetchapters >>>2
 \providebool{resetchapters}
 \DeclareOption{resetchapters}{\booltrue{resetchapters}}
@@ -86,7 +131,12 @@
 
 \ProcessOptions\relax
 
-\LoadClass[12pt, oneside, openany, a4paper, article]{memoir}
+\ifbool{quali}{%
+  \LoadClass[12pt, a4paper]{memoir}
+}{%
+  \LoadClass[12pt, a4paper]{memoir}
+}
+
 
 % Fix http://tex.stackexchange.com/q/323924/102699
 \newcommand\chapterblock{\vskip0pt}
@@ -107,6 +157,10 @@
 \RequirePackage[inline]{enumitem}
 \RequirePackage{pageslts}
 \RequirePackage{xcolor}
+\RequirePackage{float}
+\RequirePackage{xhfill}
+\RequirePackage{atbegshi}
+\RequirePackage{graphicx}
 
 \RequirePackage{iftex}
 
@@ -139,15 +193,25 @@
 % Margins >>>1
 
 \notbool{strict}{
-  \settypeblocksize{210mm}{148mm}{*}
-  %\setbinding{1cm}
-  \setulmargins{*}{*}{1.618}
-  \setlrmargins{*}{*}{0.618}
-  \setheadfoot{\onelineskip}{2\onelineskip}
-  \setheaderspaces{*}{\onelineskip}{*}
-  \setlength{\topskip}{1.6\topskip}
-  \checkandfixthelayout
-  \sloppybottom
+  \ifbool{fapesp}{%
+    \setulmarginsandblock{3cm}{2cm}{*}
+    \setlrmarginsandblock{3cm}{2cm}{*}
+    \setheadfoot{\onelineskip}{2\onelineskip}
+    \setheaderspaces{*}{\onelineskip}{*}
+    % \setlength{\topskip}{1.6\topskip}
+    \checkandfixthelayout
+    \sloppybottom
+  }{%
+    \settypeblocksize{220mm}{*}{0.618}
+    \setbinding{1cm}
+    \setulmargins{*}{*}{1.618}
+    \setlrmargins{*}{*}{1.618}
+    \setheadfoot{\onelineskip}{2\onelineskip}
+    \setheaderspaces{*}{\onelineskip}{*}
+    \setlength{\topskip}{1.6\topskip}
+    \checkandfixthelayout
+    \sloppybottom
+  }
 }{
 	\setulmarginsandblock{3cm}{2cm}{*}
 	\setlrmarginsandblock{3cm}{2cm}{*}
@@ -188,34 +252,57 @@
 
 % Section, subsection and subsubsection >>>2
 
-\setsecheadstyle{\normalfont\scshape\large\MakeLowercase}
-
-\ifbool{paper}{%
-  \setsubsecheadstyle{\normalfont\scshape\MakeLowercase}%
+\setsecheadstyle{\normalfont\scshape\Large\MakeLowercase}
+\ifbool{fapesp}{%
+  \setbeforesecskip{1.2\baselineskip}
+  \setaftersecskip{\baselineskip}
 }{%
-  \setsubsecheadstyle{\normalfont\bfseries}%
-  % \setsubsecheadstyle{\sethangfrom{#1}\normalfont\small}
-  \setsecnumdepth{subsection}
-
-  \setsubsubsecheadstyle{\Swash}
-  % \setsubsubsecindent{\parindent}
-  % \setsubsubsecindent{0pt}
-  \setbeforesubsubsecskip{1.6\baselineskip}
-  \setaftersubsubsecskip{.6\baselineskip}
+  \setbeforesecskip{2\baselineskip}
+  \setaftersecskip{1.6\baselineskip}
 }
 
+\setsubsecheadstyle{\large\scshape\MakeLowercase}%
+\ifbool{fapesp}{%
+  \setbeforesubsecskip{\baselineskip}
+  \setaftersubsecskip{0.6\baselineskip}
+  \setsecnumdepth{subsection}
+}{%
+  \setbeforesubsecskip{1.6\baselineskip}
+  \setaftersubsecskip{\baselineskip}
+  % \setsubsecheadstyle{\sethangfrom{#1}\normalfont\small}
+  \setsecnumdepth{subsection}
+}
+
+
+\setsubsubsecheadstyle{\Swash}
+% \setsubsubsecindent{\parindent}
+% \setsubsubsecindent{0pt}
+\setbeforesubsubsecskip{1\baselineskip}
+\setaftersubsubsecskip{.6\baselineskip}
+
 \hangsecnum
+
+\ifbool{section}{%
+  \renewcommand{\thesection}{\arabic{section}}
+  \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+  \let\l@subsection\l@section
+  \let\l@section\l@chapter
+}{}
+
 
 % <<<2
 
 % Chapter >>>2
+
+% \newcommand{\openright}{\@openrighttrue\@openleftfalse%
+%   \gdef\clearforchapter{\cleartorecto}}
 
 \aliaspagestyle{chapter}{simple}
 
 \makechapterstyle{dbmhangnum}{% >>>3
   \chapterstyle{default}
   \setlength{\beforechapskip}{50pt}
-  \setlength{\afterchapskip}{20pt}
+  \setlength{\afterchapskip}{25pt}
   \renewcommand*{\chapterheadstart}{\vspace{\beforechapskip}}
   \settowidth{\chapindent}{%
     \normalfont\scshape\HUGE \thechapter \normalfont\normalsize\quad%
@@ -226,10 +313,19 @@
     \noindent\llap{\makebox[\chapindent][l]{\chapnumfont \thechapter}}}
   \renewcommand*{\afterchapternum}{}%
     \renewcommand*{\printchaptertitle}[1]{\MakeLowercase{\chaptitlefont ##1}}
-    \renewcommand*{\chapnamefont}{\normalfont\Large\scshape}
-   \renewcommand*{\chaptitlefont}{\normalfont\Large\scshape}
-    \renewcommand*{\chapnumfont}{\normalfont\Large\scshape}
+    \renewcommand*{\chapnamefont}{\normalfont\LARGE\scshape}
+   \renewcommand*{\chaptitlefont}{\normalfont\LARGE\scshape}
+    \renewcommand*{\chapnumfont}{\normalfont\LARGE\scshape}
 }% <<<3
+
+% \renewcommand\chapter{%
+%   \ifartopt\par\@nameuse{chapterblock}\else
+%     \clearforchapter
+%     \thispagestyle{chapter}
+%     \global\@topnum\z@
+%   \fi
+%   \m@mindentafterchapter
+%   \@ifstar{\@m@mschapter}{\@m@mchapter}}
 
 % TODO: Usar Large quando o capítulo começa na mesma
 % página e HUGE quando começa sempre numa página nova.
@@ -245,8 +341,8 @@
 
 \ifbool{paper}{%
   \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
-  \renewcommand*{\partnamefont}{\normalfont\Capt\scshape\Large\MakeLowercase}
-  \renewcommand*{\partnumfont}{\normalfont\Capt\scshape\Large\MakeLowercase}
+  \renewcommand*{\partnamefont}{\normalfont\scshape\Large\MakeLowercase}
+  \renewcommand*{\partnumfont}{\normalfont\scshape\Large\MakeLowercase}
 }{
   \notbool{quali}{%
     \renewcommand*{\parttitlefont}{\normalfont\Large\Swash}
@@ -282,6 +378,15 @@
 
 % User variables >>>2
 
+\newcommand*{\alttitle}[1]{\gdef\@alttitle{#1}}
+\newcommand*{\@alttitle}{}
+
+\newcommand*{\altsubtitle}[1]{\gdef\@altsubtitle{#1}}
+\newcommand*{\@altsubtitle}{}
+
+\newcommand*{\subtitle}[1]{\gdef\@subtitle{#1}}
+\newcommand*{\@subtitle}{}
+
 \newcommand*{\cuttercode}[1]{\gdef\@cuttercode{#1}}
 \newcommand*{\@cuttercode}{\textbackslash cuttercode}
 
@@ -292,10 +397,16 @@
 \newcommand*{\@faculty}{Faculdade de Filosofia, Letras e Ciências Humanas}
 
 \newcommand*{\department}[1]{\gdef\@department{#1}}
-\newcommand*{\@department}{\textbackslash department}
+\newcommand*{\@department}{Departamento de Filosofia}
+
+\newcommand*{\program}[1]{\gdef\@program{#1}}
+\newcommand*{\@program}{Programa de Pós Graduação em Filosofia}
 
 \newcommand*{\field}[1]{\gdef\@field{#1}}
 \newcommand*{\@field}{\textbackslash field}
+
+\newcommand*{\area}[1]{\gdef\@area{#1}}
+\newcommand*{\@area}{História da Filosofia Contemporânea}
 
 \newcommand*{\committee}[1]{\gdef\@committee{#1}}
 \newcommand*{\@committee}{\textbackslash committee}
@@ -303,8 +414,17 @@
 \newcommand*{\supervisor}[1]{\gdef\@supervisor{#1}}
 \newcommand*{\@supervisor}{\textbackslash supervisor}
 
+\newcommand*{\altkeywords}[1]{\gdef\@altkeywords{#1}}
+\newcommand*{\@altkeywords}{\textbackslash altkeywords}
+
 \newcommand*{\keywords}[1]{\gdef\@keywords{#1}}
 \newcommand*{\@keywords}{\textbackslash keywords}
+
+\newcommand*{\defensedate}[1]{\gdef\@defensedate{#1}}
+\newcommand*{\@defensedate}{\textbackslash defensedate}
+
+\newcommand*{\supervisorsignature}[1]{\gdef\@supervisorsignature{#1}}
+\newcommand*{\@supervisorsignature}{\textbackslash supervisorsignature}
 
 \newcommand*{\organization}[1]{\gdef\@organization{#1}}
 \newcommand*{\@organization}{%
@@ -318,16 +438,16 @@
 \ifbool{masters}{%
   \newcommand*{\goal}[1]{\gdef\@goal{#1}}
   \newcommand*{\@goal}{Mestre em \@field}
-  \newcommand*{\program}[1]{\gdef\@program{#1}}
-  \newcommand*{\@program}{Mestrado}
+  \newcommand*{\degree}[1]{\gdef\@degree{#1}}
+  \newcommand*{\@degree}{Mestrado}
   \newcommand*{\thesistype}[1]{\gdef\@thesistype{#1}}
   \newcommand*{\@thesistype}{Dissertação}
 }{%
   \ifbool{thesis}{%
     \newcommand*{\goal}[1]{\gdef\@goal{#1}}
     \newcommand*{\@goal}{Doutor em \@field}
-    \newcommand*{\program}[1]{\gdef\@program{#1}}
-    \newcommand*{\@program}{Doutorado}
+    \newcommand*{\degree}[1]{\gdef\@degree{#1}}
+    \newcommand*{\@degree}{Doutorado}
     \newcommand*{\thesistype}[1]{\gdef\@thesistype{#1}}
     \newcommand*{\@thesistype}{Tese}
   }{}
@@ -384,29 +504,68 @@
   \end{center}\par
 }% <<<2
 
+\newcommand{\makeprojectcover}{% >>>2
+  \begin{titlingpage}%
+    \ifbool{project}{%
+      \vspace*{\fill}
+      \noindent\@author
+
+      \noindent\@area
+    }{}%
+  \end{titlingpage}
+}% <<<2
+
 \newcommand{\makecover}{% >>>2
   \begin{titlingpage}%
+    \ifbool{sfcover}{\sffamily}{}
     \newlength{\marginoffset}
-    \ifbool{paper}{%
+    % \ifbool{paper}{%
       \calccentering{\marginoffset}%
-    }{%
-      \setlength{\marginoffset}{0pt}%
-    }
+    % }{%
+    %   \setlength{\marginoffset}{0pt}%
+    % }
     \begin{adjustwidth*}{\marginoffset}{-\marginoffset}
       \center
-      {\large \textsc{\MakeLowercase{\@organization}}}
+      {\small\ifbool{sfcover}{\sfscfamily}{\scshape}%
+      \MakeUppercase{\@university}%
+
+      \MakeUppercase{\@faculty}%
+
+      \MakeUppercase{\@department}%
+
+      \MakeUppercase{\@program}%
+      }
       \vfill
-      {\large \@author}
+      {\normalsize \@author}
       \vfill
-      {\Large \textbf{\@title}}
+      {\ifbool{sfcover}{\sffamily}{\Title}\large \textbf{\@title:}}
+
+      \ifdefempty{\@subtitle}{}{%
+        \ifbool{sfcover}{\sffamily}{\Title}\large \textbf{\@subtitle}%
+      }
+
+      % \vspace{0.6\baselineskip}
+
+      % {\ifdefempty{\@subtitle}{}{\large \@subtitle}}
       \vfill
-      {\large \@location \\ \@date}
+      \ifbool{thesis}{%
+        \ifbool{corrigida}{%
+          \normalsize Versão corrigida%
+        }{%
+          \normalsize Versão original%
+        }%
+        \vfill
+      }{}
+      {\normalsize \@location
+
+      \@date}
     \end{adjustwidth*}
   \end{titlingpage}
 }% <<<2
 
 \newcommand{\maketitlepage}{% >>>2
-  \begin{titlingpage}%
+  % \begin{titlingpage}%
+    \thispagestyle{empty}
     \newlength{\tpmarginoffset}
     \ifbool{quali}{%
       \calccentering{\tpmarginoffset}%
@@ -420,34 +579,61 @@
         \vfill
         \vfill
       }{}
-      {\large \@author}
+      % {\small\scshape%\ifbool{sfcover}{\sfscfamily}{\scshape}
+      % \MakeUppercase{\@author}}
+      \@author
       \vfill
+      \vfill
+      % \vfill
       \vfill%
-      {\Large \textbf{\@title}}
-        \ifbool{quali}{%
-          \vspace{20pt}\par
-          {\small Texto para qualificação}
-          \vfill
+      \ltx@ifpackageloaded{dbmrqminion}{%
+        {\Title\large \textbf{\@title:}}
+      }{%
+        {\large \textbf{\@title}}
+      }
+
+      \vspace{0.3\baselineskip}
+      \ifdefempty{\@subtitle}{}{%
+        \ltx@ifpackageloaded{dbmrqminion}{%
+          {\Title\large \textbf{\@subtitle}}
         }{%
-          \vfill
-          \hspace{.5\textwidth}
-          \begin{minipage}{.49\textwidth}
-            \SingleSpacing
-            \@thesistype\ apresentada à \@faculty\ da \@university\ para
-            obtenção do título de \@goal\, sob orientação do Prof. Dr.
-            \@supervisor.
-          \end{minipage}%
+          {\large \textbf{\@subtitle}}
         }
+      }
+      \vfill
+        \ifbool{corrigida}{%
+          Versão corrigida%
+        }{%
+          Versão original%
+        }%
+      \ifbool{quali}{%
+        \vfill
+        \vspace{20pt}\par
+        {\small Texto para qualificação}
+        \vfill
+      }{%
+        \vfill
+        \vspace{-20pt}
+        \hspace{.5\textwidth}
+        \begin{minipage}{.49\textwidth}
+          \small
+          \SingleSpacing
+          \@thesistype\ apresentada à \@faculty\ da \@university\ para
+          obtenção do título de \@goal, sob orientação do Prof. Dr.
+          \@supervisor.
+        \end{minipage}%
+      }
       \vfill
       {\large \@location \\ \@date}
     \end{adjustwidth*}
-  \end{titlingpage}
+  % \end{titlingpage}
 }% <<<2
 
 \newcommand{\makecolophon}{% >>>2
-  \begin{titlingpage}%
-    \noindent  Autorizo a reprodução e divulgação total ou parcial deste
-    trabalho, por qualquer meio, convencional ou eletrônico, para fins de
+  % \begin{titlingpage}%
+    \thispagestyle{empty}
+    \noindent  Autorizo a reprodução e divulgação total ou parcial deste
+    trabalho, por qualquer meio, convencional ou eletrônico, para fins de
     estudo e pesquisa, desde que citada a fonte.
     \vfill
     \begin{center}
@@ -455,14 +641,14 @@
 
     Serviço de Biblioteca e Documentação
 
-    \@faculty da \@university
+    \@faculty\ da\ \@university
     \end{center}
     \vspace{-0.75\baselineskip}
 
     \begin{mdframed}
     \begin{raggedright}
 
-      \vspace*{3\baselineskip}
+      \vspace*{3.5\baselineskip}
       \@cuttercode
 
       \hspace*{0.15\textwidth}\begin{minipage}{0.85\textwidth}
@@ -472,17 +658,18 @@
       \exhyphenpenalty 10000
       \hbadness=10000
 
-      \vspace{-3\baselineskip}%\vspace{-2\parskip}
+      \vspace{-3.25\baselineskip}%\vspace{-2\parskip}
       \LASTFirst{\@author}
 
-      \hspace{2em} \@title\ / \@author; orientador \@supervisor\
-      - \@location, \@date.
+      \hspace{2em}
+      \@title\ifdefempty{\@subtitle}{}{:\ \@subtitle}\ /
+      \@author; orientador \@supervisor\ - \@location, \@date.
 
       \hspace{2em} \pageref{LastPage} p.
 
       \vspace{1em}
 
-      \hspace{2em} \@thesistype\ (\@program) - \@faculty\ da \@university.
+      \hspace{2em} \@thesistype\ (\@degree) - \@faculty\ da \@university.
       \@department. Área de concentração: \@field.
 
       \vspace{1em}
@@ -501,44 +688,140 @@
 
     \end{raggedright}
     \end{mdframed}
+    \clearpage
 
+  % \end{titlingpage}
+}% <<<2
+
+\newcommand{\makeconsent}{% >>>2
+  \begin{titlingpage}%
+    \ifbool{sfcover}{\sffamily}{}
+    {
+      \center
+      {%
+        \small\ifbool{sfcover}{\sfscfamily}{\scshape}%
+          \MakeUppercase{\@university}%
+
+          \MakeUppercase{\@faculty}%
+          % \MakeUppercase{\@department}%
+          % \MakeUppercase{\@program}%
+      }
+
+      \bigskip\bigskip\bigskip\bigskip\bigskip
+
+      {\bfseries\Large Entrega do exemplar corrigido da dissertação}
+
+      {\SemiBold\large Termo de ciência e concordância do orientador}
+
+    }
+
+    \bigskip\bigskip\bigskip\bigskip
+
+    {\noindent\SemiBold Nome do aluno: }{\normalsize \@author}
+
+    {\noindent\SemiBold Data da defesa: }{\normalsize \@defensedate}
+
+    {\noindent\SemiBold Nome do orientador: }{\normalsize \@supervisor}
+
+    \bigskip\bigskip
+
+    \noindent Nos termos da legislação vigente, declaro \emph{estar ciente} do
+    conteúdo deste \emph{exemplar corrigido} elaborado em atenção às
+    sugestões dos membros da comissão julgadora na sessão de defesa do
+    trabalho, manifestando-me \emph{plenamente favorável} ao seu
+    encaminhamento e publicação no \emph{Portal Digital de Teses da USP}. 
+
+    \bigskip
+
+    \noindent São Paulo, \today
+
+    \bigskip\bigskip
+
+    \hfill
+    \begin{minipage}[t]{15em}
+      \centering% 
+      \@supervisorsignature\\%
+      \rule{15em}{.5pt}\\%
+      (Assinatura do orientador)%
+    \end{minipage}
+
+
+    % \parbox[b][2.5cm][b]{20em}{%
+    %   \footnotesize%Everything in footnotesize
+    %   \centering% 
+    %   \rule{18em}{.5pt}\\
+    %   (Assinatura do orientador)
+    % }
+
+
+%     \begin{flushright}
+%       \rule{18em}{.5pt}\\
+%       (Assinatura do orientador)\hspace*{9pt}
+%     \end{flushright}
   \end{titlingpage}
 }% <<<2
 
-\newcommand{\makereference}{% >>>2
-  \noindent \LASTFirst{\@author}. \emph{\@title}. \@date. \@thesistype\
-  (\@program\ em \MakeLowercase{\@field}) -- \@faculty. \@department,
-  \@university, \@location, \@date.
+      
+\newcommand{\makealtreference}{% >>>2
+  \noindent \LASTFirst{\@author}.
+  \emph{\@alttitle}\ifdefempty{\@altsubtitle}{}{: \@altsubtitle}.
+  \@date. \@thesistype\ (\@degree\ em \@field) -- \@faculty.
+  \@department, \@university, \@location, \@date.
 }% <<<2
+      
+\newcommand{\makereference}{% >>>2
+  \noindent \LASTFirst{\@author}.
+  \emph{\@title}\ifdefempty{\@subtitle}{}{: \@subtitle}.
+  \@date. \@thesistype\ (\@degree\ em \@field) -- \@faculty.
+  \@department, \@university, \@location, \@date.
+}% <<<2
+
+\newcommand{\parecer}{%
+    Prof. Dr. \xrfill[-1.6pt]{.4pt}\hspace{.618em} Instituição: \xrfill[-1.6pt]{.4pt}
+
+    \bigskip
+    Parecer: \xrfill[-1.6pt]{.4pt}\hspace{.618em} Assinatura: \xrfill[-1.6pt]{.4pt}
+}
 
 \newcommand{\makeapproval}{% >>>2
     \begin{titlingpage}%
     \thispagestyle{empty}
+
+    %\if@twoside%
+    %  \pagestyle{empty}
+    %  \newpage~\newpage~\newpage~
+    %  %\setcounter{page}{2}
+    %\else%
+    %\fi% 
+
     \makereference
 
-    \vfil
+    \vfill
 
-    \noindent Aprovado em: \rule[-1pt]{8em}{0.4pt}
+    \noindent Aprovado em: \rule[-1.6pt]{8em}{0.4pt}
 
-    \vfil\vfil\vfil
+    \vfill\vfill\vfill\vfill
+    \center
+
+    Banca examinadora:
 
     \begin{center}
 
-    \rule{\textwidth}{0.4pt}
+    \vfill
+    \parecer
 
-    Prof. Dr. \@supervisor
+    \vfill
+    \parecer
 
-    \vfil
+    \vfill
+    \parecer
 
-    \rule{\textwidth}{0.4pt}
+    \vfill
+    \parecer
 
-    Prof. Dr. \StrBefore{\@committee}{,}
+    % \vfil
+    % \parecer
 
-    \vfil
-
-    \rule{\textwidth}{0.4pt}
-
-    Prof. Dr. \StrBehind{\@committee}{,}
     \end{center}
     \end{titlingpage}%
 }% <<<2
@@ -550,6 +833,7 @@
 \newcommand{\makethanks}{%
   \chapter{Agradecimentos}
   \@thanks%
+  \cleardoublepage
 }%
 
 % <<<2
@@ -564,13 +848,14 @@
   \addcontentsline{toc}{chapter}{Epígrafe}
   \vspace*{\fill}
   \hfill
-  \begin{minipage}{.65\textwidth}
+  \begin{minipage}{.618\textwidth}
 
   \abnormalparskip{0.7\baselineskip}%
 
   \@epigraph
 
   \end{minipage}
+  \cleardoublepage
 }
 
 % <<<2
@@ -578,35 +863,68 @@
 % Abstract >>>2
 
 \newcommand{\resumo}[1]{\gdef\@resumo{#1}}
-\newcommand{\@resumo}{\lipsum[1-2]}
+\newcommand{\@resumo}{\lipsum[2]}
 
 \renewcommand{\abstract}[1]{\gdef\@abstract{#1}}
-\newcommand{\@abstract}{\lipsum[1-2]}
+\newcommand{\@abstract}{\lipsum[2]}
 
 \newcommand{\makeabstract}{
+  \begin{Spacing}{1.4}
   \chapter{Resumo}
   \makereference
 
-  \hspace{\baselineskip}
+  \vspace{.5\baselineskip}
 
+  \noindent
+  % \ltx@ifpackageloaded{dbmrqminion}{%
+  %   {\SemiBold Resumo:}
+  % }{%
+  %   \textbf{Resumo:}
+  % }
   \@resumo
 
-  \hspace{\baselineskip}
+  \vspace{.5\baselineskip}
 
-  \noindent Palavras chave:
+  \noindent
+  \ltx@ifpackageloaded{dbmrqminion}{%
+    {\SemiBold Palavras chave:}
+  }{%
+    \textbf{Palavras chave:}
+  }
+  \StrBefore{\@keywords}{,}, \StrBetween[1,2]{\@keywords}{,}{,},
+  \StrBetween[2,3]{\@keywords}{,}{,}, \StrBetween[3,4]{\@keywords}{,}{,},
+  \StrBehind[4]{\@keywords}{,}.
+  \vspace{\baselineskip}
+  \cleardoublepage
 
-  \clearpage
+  % \clearpage
 
   \chapter{Abstract}
-  \makereference
+  \makealtreference
 
-  \hspace{\baselineskip}
+  \vspace{.5\baselineskip}
 
+  \noindent
+  % \ltx@ifpackageloaded{dbmrqminion}{%
+  %   {\SemiBold Abstract:}
+  % }{%
+  %   \textbf{Abstract:}
+  % }
   \@abstract
 
-  \hspace{\baselineskip}
+  \vspace{.5\baselineskip}
 
-  \noindent Keywords:
+  \noindent
+  \ltx@ifpackageloaded{dbmrqminion}{%
+    {\SemiBold Keywords:}
+  }{%
+    \textbf{Keywords:}
+  }
+  \StrBefore{\@altkeywords}{,}, \StrBetween[1,2]{\@altkeywords}{,}{,},
+  \StrBetween[2,3]{\@altkeywords}{,}{,},
+  \StrBetween[3,4]{\@altkeywords}{,}{,}, \StrBehind[4]{\@altkeywords}{,}.
+  \cleardoublepage
+  \end{Spacing}
 }
 
 % <<<2
@@ -628,6 +946,10 @@
 \setlist*[inlinex,1]{%
   label=(\arabic*), itemjoin={{, }}, itemjoin*={{ ou }}%
 }
+\newlist{inlinalt}{enumerate*}{1}
+\setlist*[inlinalt,1]{%
+  before={ ou\ }, label=(\arabic*), itemjoin={{, ou }}%
+}
 \newlist{inlinin*}{enumerate*}{1}
 \setlist*[inlinin*,1]{%
   label=(\arabic*), itemjoin={{; }}, itemjoin*={{ e }}%
@@ -635,6 +957,10 @@
 \newlist{inlinex*}{enumerate*}{1}
 \setlist*[inlinex*,1]{%
   label=(\arabic*), itemjoin={{; }}, itemjoin*={{ ou }}%
+}
+\newlist{inlinalt*}{enumerate*}{1}
+\setlist*[inlinalt*,1]{%
+  before={ ou\ }, label=(\arabic*), itemjoin={{; ou }}%
 }
 
 \renewenvironment{quote}{%
@@ -693,7 +1019,7 @@
 \renewcommand{\cftchapterfont}{\normalsize\bfseries}
 \renewcommand{\cftchapterpresnum}{\hspace*{-1.5em}}
 \cftsetindents{chapter}{1.5em}{0em}
-\renewcommand{\cftchapterleader}{}
+\renewcommand{\cftchapterleader}{\hspace{.5em}}
 \renewcommand{\cftchapterafterpnum}{\cftparfillskip}
 
 \renewcommand{\cftsectionfont}{\small\bfseries}
@@ -715,6 +1041,40 @@
 % <<<1
 
 % Misc >>>1
+
+\newif\ifstartblanks@nextblank
+
+\newcommand*\startblanks@blanks{}%
+\let\startblanks@blanks\relax
+\newcommand*\startblanks{%
+  \global\startblanks@nextblanktrue
+  \gdef\startblanks@blanks%
+    {%
+      \ifstartblanks@nextblank
+        \thispagestyle{empty}%
+        % \addtocounter{page}{-1}%
+        \mbox{}%
+        \clearpage
+        \global\startblanks@nextblankfalse
+      \else
+        \global\startblanks@nextblanktrue
+      \fi
+    }%
+  \AtBeginShipout{\startblanks@blanks}
+}
+\newcommand*\stopblanks{%
+  \global\let\startblanks@blanks\relax
+}
+
+\newcommand{\clearemptydoublepage}{%
+  \if@twoside%
+    {\null\newpage\thispagestyle{empty}}
+    {\null\newpage\thispagestyle{empty}}
+    \cleartooddpage[\thispagestyle{empty}]
+  \else
+    \clearpage
+  \fi%  
+}
 
 \newbool{final}
 \notbool{quali}{\booltrue{final}}{}
@@ -772,6 +1132,14 @@
       %   {}%
       \if@twoside\markright{\memUChead{#1}}\fi}% <<<2
 
+    \defbibheading{subsubsubbibliography}[\refname]{% >>>2
+      \subsubsection*{#1}%
+      % \ifmemoirbibintoc
+      %   {\phantomsection
+      %   \addcontentsline{toc}{section}{#1}}
+      %   {}%
+      \if@twoside\markright{\memUChead{#1}}\fi}% <<<2
+
     \renewcommand*{\bibnameunderscore}{%
       \rule[-1pt]{3em}{0.75pt}%
     }
@@ -808,6 +1176,7 @@
   % \pagestyle{dbmheader}
 
   \ifbool{paper}{\makecover}{}
+  \ifbool{project}{\makeprojectcover}{}
 
   \ifbool{thesis}{% >>>2
     \SingleSpacing
@@ -816,8 +1185,10 @@
 
 
     \notbool{quali}{%
-      \makecover
-      \clearpage
+      \notbool{hardcover}{%
+        \makecover
+        \clearpage
+      }{}
     }{}
 
     \maketitlepage
@@ -825,19 +1196,34 @@
 
     \notbool{quali}{%
 
+      % \afterpage{\repeatafter}
+
       \makecolophon
-      \clearpage
+      % \clearpage
+      \ifbool{corrigida}{\makeconsent}{}%
+      % \clearpage
       \makeapproval
-      \clearpage
+      % \clearpage
       \makethanks
-      \clearpage
+      % \clearpage
       \makeepigraph
-      \clearpage
+      % \clearpage
       \makeabstract
-      \clearpage
+      % \clearpage
+      % \afterpage{}
     }{}
 
-    \tableofcontents*
+    % \clearpage
+    \if@twoside%
+      \startblanks
+      \pagestyle{empty}
+      \tableofcontents*
+      \stopblanks
+      \cleardoublepage
+    \else
+      \pagestyle{empty}
+      \tableofcontents*
+    \fi% 
 
   }{}% <<<2
 
@@ -845,14 +1231,46 @@
   \pagestyle{simple}
 
   \ifbool{strict}{%
-    \begin{Spacing}{1.4}
+    \ifbool{fapesp}{%
+      \begin{Spacing}{2.0}
+    }{%
+      \begin{Spacing}{1.5}
+    }
   }{%
-    \begin{Spacing}{1.5}
+    \ifbool{fapesp}{%
+      \begin{Spacing}{1.8}
+    }{%
+      \ifbool{quali}{%
+        \begin{Spacing}{1.8}
+      }{%
+        \begin{Spacing}{1.4}
+      }
+    }
   }
+
+  \ifbool{project}{%
+    % \begin{center}
+    {\HUGE\bfseries
+     \noindent\@title\ifdefempty{\@subtitle}{\vspace*{2em}}{:\vspace*{5pt}}
+     \thispagestyle{empty}}\\
+      \ifdefempty{\@subtitle}{}{%
+        {\HUGE\bfseries \@subtitle}\vspace*{2em}\\
+      }
+    {\large\today}%\vspace{1em}%
+    % \end{center}
+  }{}
 
 }% <<<1
 
 \AtBeginDocument{% >>>1
+
+\ltx@ifpackageloaded{biblatex}{%
+  \addto\extrasbrazil{%
+    \renewcommand{\chapterautorefname}{capítulo}%
+    \renewcommand{\sectionautorefname}{seção}%
+    \renewcommand{\partautorefname}{parte}%
+  }
+}{}
 
 \frenchspacing
 
